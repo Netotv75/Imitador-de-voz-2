@@ -1,0 +1,91 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>amererador de voz</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #FFF700;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            text-align: center;
+        }
+
+        #pou {
+            width: 150px;
+            height: auto;
+        }
+
+        #controls {
+            margin-top: 20px;
+        }
+
+        #recordButton {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <img id="pou" src="/bb7d024623450ff1b70d52ef8fbc8847_icon.png" alt="Pou">
+        <div id="controls">
+            <button id="recordButton">Hablar</button>
+        </div>
+    </div>
+    <script>
+        const recordButton = document.getElementById('recordButton');
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recordButton.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        recognition.addEventListener('result', (event) => {
+            const speechResult = event.results[0][0].transcript;
+            console.log('Result received: ' + speechResult);
+            speakWithSquirrelVoice(speechResult);
+        });
+
+        recognition.addEventListener('speechend', () => {
+            recognition.stop();
+        });
+
+        recognition.addEventListener('error', (event) => {
+            console.error('Speech recognition error detected: ' + event.error);
+        });
+
+        function speakWithSquirrelVoice(text) {
+            let utterance = new SpeechSynthesisUtterance(text);
+            let voices = window.speechSynthesis.getVoices();
+            let squirrelVoice = voices.find(voice => voice.name === 'Google UK English Female') || voices[0]; // Default to first available female voice
+
+            utterance.voice = squirrelVoice;
+            utterance.pitch = 3.0; // Increase pitch for squirrel effect
+            utterance.rate = 1.5; // Increase rate for faster and more chipmunk-like effect
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Load voices when available
+        window.speechSynthesis.onvoiceschanged = function() {
+            window.speechSynthesis.getVoices();
+        };
+    </script>
+</body>
+</html>
